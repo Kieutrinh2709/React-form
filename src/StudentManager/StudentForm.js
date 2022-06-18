@@ -5,13 +5,13 @@ class StudentForm extends Component {
 
   state = {
     values:{
-      maSV: '',
+      id: '',
       hoTen: '',
       phone: '',
       email: ''
     }, 
     errors:{
-      maSV: '',
+      id: '',
       hoTen: '',
       phone: '',
       email: ''
@@ -58,8 +58,23 @@ class StudentForm extends Component {
   }
   handleSubmit = (evt) =>{
     evt.preventDefault();
-    this.props.addStudent(this.state.values);
+    if (this.props.student.id) {
+      // Cập nhật
+      this.props.onUpdateStudent(this.props.student.id, this.state.values);
+    } else {
+      // Tạo mới
+      const id = Math.floor(Math.random() * 100);
+      const student = { ...this.state.values, id };
+      this.props.onAddStudent(student);
+    }
 
+  };
+  componentDidUpdate(prevProps, prevState) {
+    // Vì hàm componentDidUpdate luôn luôn được chạy sau khi props hoặc state thay đổi
+    // Ta sẽ kiểm tra nếu props user thay đổi sẽ set state lại cho object values
+    if (prevProps.student.id !== this.props.student.id) {
+      this.setState({ values: { ...this.props.student } });
+    }
   };
 
   renderSubmit=()=>{
@@ -86,10 +101,10 @@ class StudentForm extends Component {
             <form onSubmit={this.handleSubmit}>
               <div className="row ">
                 <div className="form-group col-6">
-                  <label htmlFor="maSV" className="form-label">Mã SV</label>
-                  <input type="text" id="maSV" name="maSV" className="form-control" value={this.state.values.maSV} onChange={this.handleChange} />
+                  <label htmlFor="id" className="form-label">Mã SV</label>
+                  <input type="text" id="id" name="id" className="form-control" value={this.state.values.id} onChange={this.handleChange} />
                   <p className="text-danger">
-                    {this.state.errors.maSV}
+                    {this.state.errors.id}
                   </p>
                 </div>
                 <div className="form-group col-6">
@@ -127,17 +142,26 @@ class StudentForm extends Component {
     )
   }
 }
-
+const mapStateToProps = (state) => {
+  return {
+    student: state.student.selectedStudent,
+  };
+};
 const mapDispatchToProps = (dispatch) => {
   return {
-    addStudent: (student) => {
+    onAddStudent: (student) => {
       const action = {
         type: 'ADD_STUDENT', 
         student
       }
       dispatch(action);
     },
-
-  }
-}
-export default connect(null, mapDispatchToProps)(StudentForm)
+    onUpdateStudent:(studentId, student)=>{
+      const action = { 
+        type: "UPDATE_STUDENT", 
+        studentId, student };
+      dispatch(action);
+    },
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(StudentForm)
