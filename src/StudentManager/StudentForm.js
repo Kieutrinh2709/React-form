@@ -71,7 +71,7 @@ class StudentForm extends Component {
   };
   componentDidUpdate(prevProps, prevState) {
     // Vì hàm componentDidUpdate luôn luôn được chạy sau khi props hoặc state thay đổi
-    // Ta sẽ kiểm tra nếu props user thay đổi sẽ set state lại cho object values
+    // Ta sẽ kiểm tra nếu props student thay đổi sẽ set state lại cho object values
     if (prevProps.student.id !== this.props.student.id) {
       this.setState({ values: { ...this.props.student } });
     }
